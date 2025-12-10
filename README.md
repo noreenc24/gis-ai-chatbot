@@ -1,11 +1,7 @@
 # Arctic Data GIS Chatbot (GeoAI Spatial Analysis)
+This GIS chatbot is a full-stack web application that uses AI (Google Gemini) to answer natural language questions about geospatial data. This project is specifically scoped to only perform buffer analyses on schools and oil pipelines in Alaska, but it can be scaled to handle additional types of geoprocessing functions and accomodate other topic-specific datasets.
 
-A full-stack web application that uses AI (Google Gemini) to answer natural language questions about geospatial data, performing buffer analysis on schools and pipelines in Alaska.
-
-Full-stack web app that uses a LLM to answer natural language questions about geospatial data
-
-## Project Overview
-
+## What is a GIS chatbot?
 This project demonstrates:
 - **Natural Language GIS Queries**: Ask spatial questions in plain English
 - **AI Function Calling**: Gemini LLM interprets queries and calls spatial functions
@@ -25,13 +21,12 @@ Google Gemini 1.5 Flash
     ↓ Structured Parameters
 GIS Processor (GeoPandas)
     ↓ Spatial Query
-SQLite Database (SpatiaLite)
+SQLite Database with shapefiles (SpatiaLite)
     ↓ GeoJSON Results
 Mapbox Visualization
 ```
 
-## 🛠️ Tech Stack
-
+## Tech Stack
 ### Backend
 - **FastAPI**: Modern async web framework
 - **Google Gemini 1.5 Flash**: LLM with function calling
@@ -45,19 +40,23 @@ Mapbox Visualization
 - **Vite**: Build tool
 
 ## Technical Prerequisites
-
+You will need the following versions of Python and Node.js on your computer:
 - Python 3.9+
 - Node.js 18+
 - Google Gemini API Key (free)
 - Mapbox API Token (free)
 
-## Set Up Steps:
+To check if you have the correct 
+
+
+## Quick Start for Set Up:
+Open an IDE (like VSCode) or your computer's terminal application and copy and paste the following terminal commands in each step:
 
 ### 1. Clone this GitHub repository
 
 ```bash
-git clone <your-repo>
-cd gis-chatbot
+git clone https://github.com/noreenc24/gis-ai-chatbot.git
+cd gis-chatbot 
 ```
 
 ### 2. Backend Setup
@@ -72,19 +71,28 @@ python -m venv venv
 # Activate virtual environment
 # On Windows:
 venv\Scripts\activate
+
 # On Mac/Linux:
 source venv/bin/activate
+```
 
 # Install dependencies
+
+### 3. Install dependencies listed in requirements.txt file (AKA all the required packages)
+Dependencies are the 
+
+```bash
 pip install -r requirements.txt
+```
 
 # Create .env file
+```bash
 echo "GOOGLE_API_KEY=your_key_here" > .env
 ```
 
-**Get Google Gemini API Key (Free):**
-1. Visit: https://aistudio.google.com/app/apikey
-2. Click "Create API Key"
+**Get your free Google Gemini API Key**
+1. Visit https://aistudio.google.com/app/apikey
+2. Click "Create API Key", Select
 3. Copy key to `.env` file
 
 ### 3. Initialize Database
@@ -236,27 +244,6 @@ results = schools[schools.within(buffered)]
 - Blue polygons = buffer zones
 - Click points for details
 
-## 🎓 For Your Final Project
-
-### What to Include in Your Presentation
-
-1. **Demo the working app** (2-3 example queries)
-2. **Explain the architecture** (show diagram)
-3. **Show key code snippets**:
-   - Gemini function calling (`llm_handler.py`)
-   - Buffer analysis (`gis_processor.py`)
-   - React + Mapbox integration (`MapView.jsx`)
-4. **Discuss limitations & future work**
-
-### Reproducibility Checklist
-
-✅ All code in GitHub repository  
-✅ Sample data included (no large downloads)  
-✅ Free API tiers (Gemini + Mapbox)  
-✅ Clear setup instructions (this README)  
-✅ requirements.txt + package.json  
-✅ Works on Windows/Mac/Linux  
-
 ### Future Enhancements
 
 - Support more GIS operations (intersect, clip, union)
@@ -265,7 +252,7 @@ results = schools[schools.within(buffered)]
 - Export results as CSV/Shapefile
 - User upload of custom GeoJSON
 
-## 🐛 Troubleshooting
+## 🐛 Troubleshooting issues/bugs
 
 ### Backend won't start
 
