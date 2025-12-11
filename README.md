@@ -25,6 +25,30 @@ I used two datasets:
 5. LLM interprets these analysis results into a natural-language message to user.
 6. API endpoint returns this message AND geojson for mapping to the user.
 
+## Project Structure
+
+```
+gis-chatbot/
+├── backend/
+│   ├── app.py                 # FastAPI server
+│   ├── database.py            # SQLite + data loading
+│   ├── gis_processor.py       # GeoPandas buffer analysis
+│   ├── llm_handler.py         # Gemini LLM function calling
+│   ├── requirements.txt
+│   └── data/
+│       ├── gis_data.db         # Generated SQLite database
+│       ├── a_Arctic_Education_OSM    # Example dataset 1
+│       └── oil_pipelines.geojson  # Example dataset 2
+├── frontend/
+│   ├── src/
+│   │   ├── App.jsx            # Main component
+│   │   ├── App.css            # Styles
+│   │   └── main.jsx           # Entry point
+│   ├── package.json
+│   └── index.html
+└── README.md
+```
+
 ## Tech Stack
 While the high-level architecture of this codebase is set up to accomodate a full stack application, only the backend processes were developed for the scope of this final project.
 
@@ -168,32 +192,6 @@ Frontend runs at: `http://localhost:5173`
    - "Find schools within 2 kilometers of pipelines"
    - "What schools are near pipelines?"
 3. View results on the interactive map
-4. Red dots = schools found within buffer
-5. Blue shaded areas = buffer zones
-
-## Project Structure
-
-```
-gis-chatbot/
-├── backend/
-│   ├── app.py                 # FastAPI server
-│   ├── database.py            # SQLite + data loading
-│   ├── gis_processor.py       # GeoPandas buffer analysis
-│   ├── llm_handler.py         # Gemini LLM function calling
-│   ├── requirements.txt
-│   └── data/
-│       ├── gis_data.db         # Generated SQLite database
-│       ├── a_Arctic_Education_OSM    # Example dataset 1
-│       └── oil_pipelines.geojson  # Example dataset 2
-├── frontend/
-│   ├── src/
-│   │   ├── App.jsx            # Main component
-│   │   ├── App.css            # Styles
-│   │   └── main.jsx           # Entry point
-│   ├── package.json
-│   └── index.html
-└── README.md
-```
 
 ## Resources
 - **Gemini API**: https://ai.google.dev/gemini-api/docs
