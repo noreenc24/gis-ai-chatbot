@@ -103,9 +103,9 @@ def convert_to_meters(distance: float, unit: str) -> float:
 
 # Test function
 if __name__ == "__main__":
-    # Test buffer analysis
+    # Test buffer analysis for how many schools are located within 0.5 miles of oil pipelines
     try:
-        print("🧪 Testing buffer analysis...")
+        print("Testing buffer analysis:")
         result = perform_buffer_analysis(
             target_layer="a_arctic_education_osm",
             buffer_layer="oil_pipelines",
@@ -113,7 +113,7 @@ if __name__ == "__main__":
             unit="miles"
         )
         
-        print(f"   Features found: {result['count']}")
+        print(f"Features found: {result['count']}")
     
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"Error: {e}")

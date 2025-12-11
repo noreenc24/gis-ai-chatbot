@@ -1,56 +1,49 @@
-# Arctic Data GIS Chatbot (GeoAI Spatial Analysis)
-This GIS chatbot is a full-stack web application that uses AI (Google Gemini) to answer natural language questions about geospatial data. This project is specifically scoped to only perform buffer analyses on schools and oil pipelines in Alaska, but it can be scaled to handle additional types of geoprocessing functions and accomodate other topic-specific datasets.
+# Increasing Accessibility to Arctic Spatial Data Analysis with LLMs (Natural Language GIS Chatbot)
+This GIS chatbot is a backend application that uses an LLM (Google Gemini) to answer natural language questions about spatial data. In other words, to interact with this chatbot, you will need to start a locally-hosted server and make API calls through there, instead of typing into a standard, aesthetic chatbot-looking user interface.
 
-## What is a GIS chatbot?
-This project demonstrates:
-- **Natural Language GIS Queries**: Ask spatial questions in plain English
-- **AI Function Calling**: Gemini LLM interprets queries and calls spatial functions
+This project is specifically scoped to only perform buffer analyses on schools and oil pipelines in the Arctic, but it can be scaled to handle additional types of geoprocessing functions and accomodate other topic-specific datasets.
+
+In its full vision, this chatbot could be integrated within a full-stack web GIS application to further complement the accessibility to basic geospatial analyses that a regular, standalone web GIS app offers. Therefore, the technical architecture of this project includes also includes the framework structure for additional frontend development. 
+
+## Project Capabilities:
+This GIS chatbot backend application's capabilities include: 
+- **Natural Language GIS Queries**: Users can ask spatial questions in plain English
+- **AI Function Calling**: Gemini LLM interprets these user queries and calls spatial functions
 - **Automated Buffer Analysis**: GeoPandas performs spatial operations
-- **Interactive Visualization**: Mapbox displays results on an interactive map
+- **GeoJSON Output**: Returns results ready for interactive map visualization on the frontend, with Mapbox (not implemented in this project).
 
-**Example Query**: *"How many schools are within 1 mile of pipelines in Alaska?"*
+## Datasets used:
+I used two datasets:
+- [Oil pipeline infrastructure around the world](https://globalenergymonitor.org/projects/global-oil-infrastructure-tracker/)
+- [Arctic educational institutions](https://www.openstreetmap.org/#map=4/38.03/-95.80)
 
-## Architecture
-
-```
-Frontend (React + Mapbox)
-    ↓ REST API
-Backend (FastAPI)
-    ↓ Function Calling
-Google Gemini 1.5 Flash
-    ↓ Structured Parameters
-GIS Processor (GeoPandas)
-    ↓ Spatial Query
-SQLite Database with shapefiles (SpatiaLite)
-    ↓ GeoJSON Results
-Mapbox Visualization
-```
+## High-level workflow steps
+1. API endpointreceives query from user and passes it into LLM.
+2. LLM function calling: LLM identifies appropriate geoprocessing tool AND parses user's input text to extract necessary input parameters.
+3. Backend checks if relevant datasets exist/are available in SQLite database. If a dataset that a user specified in their query is missing, return error message to user.
+4. If no datasets are missing, call the appropriate geoprocessing function to get analysis results.
+5. LLM interprets these analysis results into a natural-language message to user.
+6. API endpoint returns this message AND geojson for mapping to the user.
 
 ## Tech Stack
-### Backend
-- **FastAPI**: Modern async web framework
-- **Google Gemini 1.5 Flash**: LLM with function calling
-- **SQLite + SpatiaLite**: Spatial database
-- **GeoPandas**: Spatial data processing
-- **Shapely**: Geometric operations
+While the high-level architecture of this codebase is set up to accomodate a full stack application, only the backend processes were developed for the scope of this final project.
 
-### Frontend
-- **React 18**: UI framework
-- **Mapbox GL JS**: Interactive maps
-- **Vite**: Build tool
+### Backend
+- **Google Gemini 2.5 Flash**: LLM with function calling
+- **FastAPI**: Backend API server
+- **SQLite**: Spatial database
+- **GeoPandas**: Spatial data processing
 
 ## Technical Prerequisites
-You will need the following versions of Python and Node.js on your computer:
+You will need the following on your computer:
 - Python 3.9+
-- Node.js 18+
 - Google Gemini API Key (free)
+
+For the frontend (optional): 
 - Mapbox API Token (free)
 
-To check if you have the correct 
-
-
 ## Quick Start for Set Up:
-Open an IDE (like VSCode) or your computer's terminal application and copy and paste the following terminal commands in each step:
+Open an IDE (like VSCode) or your computer's terminal application and copy and paste the following terminal commands in each step. Any steps marked with (optional) indicate that they are not within the scope of this project, but could be developed further for a full-stack application.
 
 ### 1. Clone this GitHub repository
 
@@ -59,7 +52,7 @@ git clone https://github.com/noreenc24/gis-ai-chatbot.git
 cd gis-chatbot 
 ```
 
-### 2. Backend Setup
+### 2. Backend setup
 
 ```bash
 # Navigate to backend
@@ -76,48 +69,71 @@ venv\Scripts\activate
 source venv/bin/activate
 ```
 
-# Install dependencies
-
-### 3. Install dependencies listed in requirements.txt file (AKA all the required packages)
-Dependencies are the 
+### 3. Install dependencies listed in the requirements.txt file 
+Dependencies are all the required packages needed to make the scripts in this application run. 
 
 ```bash
 pip install -r requirements.txt
 ```
 
-# Create .env file
+### 4. Set up environment variables in a .env file
+Create a .env file in the backend directory to keep your personal, unique API key safe.
 ```bash
-echo "GOOGLE_API_KEY=your_key_here" > .env
+echo "GEMINI_API_KEY=your_key_here" > .env
 ```
 
-**Get your free Google Gemini API Key**
+**Next, get your free Google Gemini API Key (which will let you connect this application to Google's Gemini models!)**
 1. Visit https://aistudio.google.com/app/apikey
-2. Click "Create API Key", Select
-3. Copy key to `.env` file
+2. Click "Create API Key"
+3. Copy the key to `.env` file
 
-### 3. Initialize Database
+### 5. Add your shapefiles
+Place your shapefiles into the ```backend/data/``` folder. This can be done within your computer's local file manager through dragging and dropping these shapefile subfolders into this project's directory.
+
+Each shapefile subfolder should contain the complete shapefile (.shp, .shx, .dbf, .prj files).
+
+### 6. Initialize database
 
 ```bash
 # Still in backend/ directory
-python -c "from database import init_database; init_database()"
+python database.py
 ```
 
-This creates:
-- `data/gis_data.db` - SQLite database
-- `data/schools.geojson` - Sample school locations
-- `data/pipelines.geojson` - Sample pipeline routes
+This creates ```data/gis_data.db``` and loads all shapefiles from the data subfolders.
 
-### 4. Start Backend Server
+### 7. Start backend server
 
 ```bash
 python app.py
 ```
-
 Backend runs at: `http://localhost:8000`
+View API docs at: `http://localhost:8000/docs`
 
-Test it: `http://localhost:8000/health`
+---
+## Using the backend application after starting the server (2 ways)
+**1. Testing via API requests**
 
-### 5. Frontend Setup
+1. Open `http://localhost:8000` in your computer's browser
+2. Click on "POST /api/chat" endpoint
+3. Click "Try it out"
+4. Enter a query related to any of the datasets in your project's database such as: "How many schools are within 1 mile of pipelines?"
+5. Click "Execute" to see the response
+
+**2. Testing via Python scripts**
+You can also test directly by running:
+```bash
+python llm_handler.py
+```
+This runs the test queries at the bottom of the file, so make sure to edit the queries as needed.
+Example queries:
+- "How many schools are within 1 mile of pipelines?"
+- "Find schools within 2 kilometers of pipelines"
+- "Which schools are near pipelines?
+
+--- 
+
+The following steps are for setting up the frontend portion of the app and are optional:
+### 8. Frontend Setup (optional)
 
 ```bash
 # Open new terminal, navigate to frontend
@@ -130,13 +146,13 @@ npm install
 echo "VITE_MAPBOX_TOKEN=your_token_here" > .env
 ```
 
-**Get Mapbox Token (Free):**
+**Get Mapbox token for free (optional):**
 1. Visit: https://account.mapbox.com/
 2. Sign up (free tier: 50,000 map loads/month)
 3. Copy "Default public token"
 4. Paste into `frontend/.env`
 
-### 6. Start Frontend
+### 6. Start Frontend (optional)
 
 ```bash
 npm run dev
@@ -144,7 +160,7 @@ npm run dev
 
 Frontend runs at: `http://localhost:5173`
 
-## 🎮 Usage
+## Full-stack Application Version Usage (optional)
 
 1. Open `http://localhost:5173` in browser
 2. Try example queries:
@@ -155,7 +171,7 @@ Frontend runs at: `http://localhost:5173`
 4. Red dots = schools found within buffer
 5. Blue shaded areas = buffer zones
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 gis-chatbot/
@@ -163,147 +179,30 @@ gis-chatbot/
 │   ├── app.py                 # FastAPI server
 │   ├── database.py            # SQLite + data loading
 │   ├── gis_processor.py       # GeoPandas buffer analysis
-│   ├── llm_handler.py         # Gemini function calling
+│   ├── llm_handler.py         # Gemini LLM function calling
 │   ├── requirements.txt
 │   └── data/
-│       ├── gis_data.db        # Generated SQLite DB
-│       ├── schools.geojson    # Generated sample data
-│       └── pipelines.geojson  # Generated sample data
+│       ├── gis_data.db         # Generated SQLite database
+│       ├── a_Arctic_Education_OSM    # Example dataset 1
+│       └── oil_pipelines.geojson  # Example dataset 2
 ├── frontend/
 │   ├── src/
 │   │   ├── App.jsx            # Main component
-│   │   ├── ChatPanel.jsx      # Chat interface
-│   │   ├── MapView.jsx        # Mapbox map
 │   │   ├── App.css            # Styles
 │   │   └── main.jsx           # Entry point
 │   ├── package.json
 │   └── index.html
-├── .env                       # API keys (backend)
 └── README.md
 ```
 
-## 🔧 How It Works
-
-### 1. User Query Processing
-
-```
-User: "How many schools within 1 mile of pipelines?"
-  ↓
-Frontend sends to: POST /api/chat
-```
-
-### 2. LLM Function Calling
-
-```python
-# Gemini receives dataset catalog + query
-# Returns structured JSON:
-{
-  "function": "buffer_analysis",
-  "target_layer": "schools",
-  "buffer_layer": "pipelines",
-  "distance": 1,
-  "unit": "miles"
-}
-```
-
-### 3. Backend Validation
-
-- Checks if datasets exist in SQLite catalog
-- If missing, returns error message to user
-
-### 4. GIS Processing
-
-```python
-# Load data from SQLite
-schools = load_layer("schools")
-pipelines = load_layer("pipelines")
-
-# Create buffer (1 mile = ~0.0145 degrees)
-buffered = pipelines.buffer(0.0145)
-
-# Spatial join
-results = schools[schools.within(buffered)]
-```
-
-### 5. Return Results
-
-```json
-{
-  "message": "Found 3 schools within 1 mile of pipelines in Alaska.",
-  "geojson": { /* GeoJSON features */ },
-  "metadata": {
-    "count": 3,
-    "operation": "buffer"
-  }
-}
-```
-
-### 6. Map Visualization
-
-- Red circles = result features (schools)
-- Blue polygons = buffer zones
-- Click points for details
-
-### Future Enhancements
-
-- Support more GIS operations (intersect, clip, union)
-- Add more datasets (roads, buildings, parks)
-- Multi-step queries (e.g., "schools AND hospitals near pipelines")
-- Export results as CSV/Shapefile
-- User upload of custom GeoJSON
-
-## 🐛 Troubleshooting issues/bugs
-
-### Backend won't start
-
-```bash
-# Check Python version
-python --version  # Must be 3.9+
-
-# Reinstall dependencies
-pip install -r requirements.txt --force-reinstall
-```
-
-### Database errors
-
-```bash
-# Regenerate database
-rm -rf data/
-python -c "from database import init_database; init_database()"
-```
-
-### Gemini API errors
-
-- Check API key in `.env`
-- Verify free tier limits: 1,500 requests/day
-- Check: https://console.cloud.google.com/
-
-### Mapbox not loading
-
-- Check token in `frontend/.env`
-- Must start with `pk.`
-- Verify free tier: 50,000 loads/month
-
-### CORS errors
-
-- Ensure backend runs on port 8000
-- Check CORS settings in `app.py`
-
-## 📚 Resources
-
+## Resources
 - **Gemini API**: https://ai.google.dev/gemini-api/docs
-- **Mapbox GL JS**: https://docs.mapbox.com/mapbox-gl-js/
 - **GeoPandas**: https://geopandas.org/
 - **FastAPI**: https://fastapi.tiangolo.com/
+- **Mapbox GL JS**: https://docs.mapbox.com/mapbox-gl-js/
 
-## 📝 License
+## MIT License
+Feel free to fork this repo and tailor for your own project!
 
-MIT License - feel free to use for your course project!
-
-## 👥 Credits
-
-Created as a final project for Spatial Data Science course.
-
----
-
-**Questions?** Open an issue or check the troubleshooting section above.
+## Credits
+This project was created as a final course project for EEPS 1350: Spatial Data Science.
