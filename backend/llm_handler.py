@@ -10,8 +10,8 @@ genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 # client = genai.Client()  # automatically gets GEMINI_API_KEY from .env file
 
 # for this project, only define the buffer function as a tool for Gemini to use
-# in the future, you could add more geoprocessing tools to this list
-# Gemini API function calling documentation link: https://ai.google.dev/gemini-api/docs/function-calling?example=meeting
+# note: in the future, you could add more geoprocessing tools to this list
+# note: Gemini API function calling documentation link: https://ai.google.dev/gemini-api/docs/function-calling?example=meeting
 geoprocessing_tools = [{
     "name": "buffer_analysis",
     "description": "Find features from one layer that are within a certain distance of features in another layer. Example: 'schools within 1 mile of pipelines'",
@@ -87,6 +87,31 @@ async def process_user_query(query: str) -> dict:
         "params": results["params"] # subdictionary with target_layer, buffer_layer, distance, unit
     }
 
+def match_dataset_name(user_dataset_term: str, catalog: dict) -> str | None:
+    """
+    Tries to match a user's natural-language dataset name that the user specifies in their query, like "schools"
+    to an actual dataset key in catalog, by indexing into that dataset's stored alias terms
+
+    Returns:
+        - the matching catalog key (e.g., "a_Arctic_education_osm")
+        - or None if no match
+    """
+    # lowercase before checking if the user term is an alias
+    user_dataset_cleaned = user_dataset_term.lower().strip()
+
+    # Scenario 1: exact alias match
+    for layer_name, info in catalog.items():
+        if user_dataset_cleaned in info["aliases"]:
+            return layer_name
+
+    # Scenario 2: partial match (e.g., user says "pipeline" but alias is "pipelines")
+    for layer_name, info in catalog.items():
+        for alias in info["aliases"]:
+            if (user_dataset_cleaned in alias) or (alias in user_dataset_cleaned):
+                return layer_name
+
+    return None
+
 
 def extract_user_intent(query: str) -> dict:
     """
@@ -146,18 +171,22 @@ def extract_user_intent(query: str) -> dict:
     
     # 6. extract parameters from Gemini's constructed arguments for the buffer analysis
     args = function_call.args
-    target_layer = args.get("target_layer")
-    buffer_layer = args.get("buffer_layer")
+    target_layer_raw = args.get("target_layer")
+    buffer_layer_raw = args.get("buffer_layer")
     distance = args.get("distance")
     unit = args.get("unit")
 
     # 7. validate that user-specified target and buffer layers exist in catalog (AKA the database)
+    target_layer = match_dataset_name(target_layer_raw, catalog)
+    buffer_layer = match_dataset_name(buffer_layer_raw, catalog)
+
     missing_datasets = [] # store user-specified datasets that don't exist in database
 
-    if target_layer not in catalog:
-        missing_datasets.append(target_layer)
-    if buffer_layer not in catalog:
-        missing_datasets.append(buffer_layer)
+    # if no aliases were found, AKA no relevant datasets were found in the project's database
+    if target_layer is None:
+        missing_datasets.append(target_layer_raw)
+    if buffer_layer is None:
+        missing_datasets.append(buffer_layer_raw)
     
     # if either target or buffer layer is missing, then return error message to user
     if missing_datasets:
@@ -219,12 +248,14 @@ def generate_results_interpretation(query: str, analysis_output: dict) -> str:
 if __name__ == "__main__":
     import asyncio
     
-    # uncomment each query one at a time (or run all at once, but make sure to add commas separating each one)
+    # note: uncomment each query one at a time (or run all at once, but make sure to add commas separating each one)
     test_queries = [
         # "How many schools are within 1 mile of pipelines?" # standard prompt
         # "Which schools are near pipelines?" # user query is missing a parameter
         # "How many dogs are near pipelines?" # include one totally unrelated dataset that doesn't exist
-        "What's the weather like" # non-spatial question
+        # "What's the weather like" # non-spatial question
+        "How many pipelines are within 0.5 miles of schools"
+        # note: add more queries here if you'd like!
     ]
     
     async def test():

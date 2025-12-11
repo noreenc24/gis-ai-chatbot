@@ -1,5 +1,5 @@
 # Increasing Accessibility to Arctic Spatial Data Analysis with LLMs (Natural Language GIS Chatbot)
-This GIS chatbot is a backend application that uses an LLM (Google Gemini) to answer natural language questions about spatial data. In other words, to interact with this chatbot, you will need to start a locally-hosted server and make API calls through there, instead of typing into a standard, aesthetic chatbot-looking user interface.
+This GIS chatbot is a backend application that uses an LLM (Google Gemini 2.5 Flash) to answer natural language questions about spatial data. In other words, to interact with this chatbot, you will need to start a locally-hosted server and make API calls through there, instead of typing into a standard, aesthetic chatbot-looking user interface.
 
 This project is specifically scoped to only perform buffer analyses on schools and oil pipelines in the Arctic, but it can be scaled to handle additional types of geoprocessing functions and accomodate other topic-specific datasets.
 

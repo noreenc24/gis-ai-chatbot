@@ -50,6 +50,8 @@ class DatasetInfo(BaseModel):
     name: str
     description: str
     geometry_type: str
+    tokens: list[str]  
+    aliases: list[str] 
 
 class DatasetsResponse(BaseModel):
     datasets: dict[str, DatasetInfo]
